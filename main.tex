@@ -1,5 +1,6 @@
 \documentclass[a4paper,12pt]{article}
 
+% ===================== PACHETE =====================
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[romanian]{babel}
@@ -12,6 +13,9 @@
 \usepackage{xcolor}
 \usepackage{hyperref}
 \usepackage{float}
+\usepackage{graphicx}
+\usepackage{enumitem}
+\usepackage{caption}
 
 \geometry{margin=2.5cm}
 
@@ -30,10 +34,15 @@
     stringstyle=\color{red!60!black},
     showstringspaces=false,
     breaklines=true,
-    frame=single
+    frame=single,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    tabsize=4
 }
 
+% ===================== TITLU =====================
 \title{\textbf{Compararea experimentală a unor algoritmi de sortare implementați în Python}}
+
 \author{
 Adrian-Sorin Onofrei\\
 Facultatea de Matematică și Informatică\\
@@ -41,98 +50,102 @@ Universitatea de Vest din Timișoara\\
 Informatică în limba română, grupa 4\\
 \texttt{adrian.onofrei06@e-uvt.ro}
 }
-\date{}
+
+\date{2026}
 
 \begin{document}
 
 \maketitle
 
+% ===================== ABSTRACT =====================
 \begin{abstract}
-Sortarea este una dintre problemele fundamentale din informatică și apare frecvent în aplicații care prelucrează date, caută informații sau organizează colecții de elemente. Deși există foarte mulți algoritmi de sortare, performanța lor diferă semnificativ în funcție de dimensiunea datelor și de modul în care acestea sunt distribuite. Din acest motiv, alegerea unui algoritm potrivit nu este doar o problemă teoretică, ci și una practică.
+Sortarea este una dintre problemele fundamentale din informatică, fiind utilizată în numeroase aplicații precum baze de date, motoare de căutare, procesarea fișierelor, analiza datelor și optimizarea altor algoritmi. Deși algoritmii de sortare au același scop, performanța lor poate varia semnificativ în funcție de dimensiunea intrării, de distribuția valorilor și de proprietățile specifice ale datelor.
 
-În această lucrare sunt analizate șase metode de sortare implementate în limbajul Python: Bubble Sort, Insertion Sort, Selection Sort, Merge Sort, Quick Sort și Counting Sort. Compararea a fost făcută pe mai multe tipuri de liste: liste aleatoare, deja sortate, sortate invers, aproape sortate și liste cu multe valori repetate. Pentru fiecare situație s-a măsurat timpul mediu de execuție.
+Această lucrare prezintă o comparație experimentală între șase algoritmi clasici de sortare implementați în limbajul Python: Bubble Sort, Insertion Sort, Selection Sort, Merge Sort, Quick Sort și Counting Sort. Algoritmii au fost testați pe mai multe tipuri de liste: liste generate aleator, liste deja sortate, liste sortate invers, liste aproape sortate și liste cu multe valori repetitive. Pentru fiecare configurație s-a măsurat timpul de execuție, folosind media a cinci rulări.
 
-Rezultatele confirmă diferențele dintre complexitățile teoretice și comportamentul practic al algoritmilor. Algoritmii de complexitate $O(n^2)$ devin rapid ineficienți pentru liste mai mari, în timp ce algoritmii mai eficienți, cum sunt Merge Sort, Quick Sort și Counting Sort, oferă timpi mult mai buni. În plus, se observă că anumite tipuri de date favorizează unii algoritmi, de exemplu Insertion Sort pe liste aproape sortate sau deja ordonate.
+Rezultatele obținute confirmă diferențele dintre complexitățile teoretice și comportamentul practic al algoritmilor. Algoritmii cu complexitate pătratică, precum Bubble Sort, Insertion Sort și Selection Sort, devin ineficienți pentru liste mari. În schimb, Merge Sort și Quick Sort oferă performanțe mult mai bune, iar Counting Sort este foarte rapid atunci când valorile sunt întregi și aparțin unui interval restrâns.
 \end{abstract}
 
+\vspace{0.4cm}
+
+\noindent\textbf{Cuvinte cheie:} algoritmi de sortare, complexitate algoritmică, Python, analiză experimentală, Bubble Sort, Insertion Sort, Selection Sort, Merge Sort, Quick Sort, Counting Sort.
+
+\tableofcontents
+\newpage
+
+% ===================== 1. INTRODUCERE =====================
 \section{Introducere}
 
-\subsection{Motivație}
-Problema sortării este importantă deoarece apare în multe domenii ale informaticii: baze de date, procesare de fișiere, căutare, analiză de date și optimizarea altor algoritmi. Deși la prima vedere sortarea pare o operație simplă, în practică există diferențe mari între metodele folosite.
+\subsection{Context general}
+Sortarea reprezintă procesul de aranjare a elementelor unei colecții într-o anumită ordine, de obicei crescătoare sau descrescătoare. În informatică, sortarea este una dintre cele mai studiate probleme, deoarece apare ca etapă intermediară în rezolvarea multor alte probleme: căutare eficientă, eliminarea duplicatelor, clasificarea informațiilor, indexarea bazelor de date și prelucrarea datelor statistice.
 
-Acest proiect a fost realizat pentru a compara în mod concret mai mulți algoritmi de sortare și pentru a observa:
+Importanța sortării este dată nu doar de frecvența cu care apare în aplicații, ci și de faptul că există mai multe metode de rezolvare, fiecare cu avantaje și dezavantaje. Unele metode sunt simple și ușor de înțeles, dar lente pentru intrări mari. Altele sunt mai complexe, însă mult mai eficiente.
+
+\subsection{Motivația alegerii temei}
+Tema a fost aleasă deoarece algoritmii de sortare sunt un punct de pornire foarte bun pentru înțelegerea conceptelor de complexitate, eficiență și analiză experimentală. În cadrul cursurilor introductive de algoritmică se studiază adesea complexitățile teoretice, însă această lucrare urmărește să arate cum se reflectă acestea în practică.
+
+Prin implementarea și testarea algoritmilor în Python se poate observa direct cât de mult influențează alegerea algoritmului timpul de execuție. De exemplu, pentru liste mici diferențele pot fi nesemnificative, dar pentru liste cu mii sau zeci de mii de elemente, algoritmii eficienți devin net superiori.
+
+\subsection{Obiectivele lucrării}
+Obiectivele principale ale lucrării sunt:
 \begin{itemize}
-    \item cum se comportă aceștia pe date de dimensiuni diferite;
-    \item cum influențează structura datelor timpul de execuție;
-    \item cât de bine se confirmă în practică analiza teoretică a complexității.
+    \item implementarea manuală a șase algoritmi clasici de sortare;
+    \item generarea mai multor tipuri de date de test;
+    \item măsurarea timpilor de execuție pentru fiecare algoritm;
+    \item compararea rezultatelor experimentale cu analiza teoretică;
+    \item identificarea situațiilor în care un anumit algoritm este avantajos.
 \end{itemize}
 
-\subsection{De ce este relevantă problema}
-În teorie, două metode pot rezolva aceeași problemă corect, dar în practică una poate fi mult mai rapidă decât alta. Pentru un student aflat la început, această diferență este importantă deoarece arată de ce complexitatea algoritmilor nu este doar un concept abstract, ci are efect direct asupra performanței unui program.
+\subsection{Structura lucrării}
+Lucrarea este organizată astfel: Secțiunea 2 prezintă formal problema sortării și algoritmii analizați. Secțiunea 3 descrie modelarea problemei și implementarea soluției. Secțiunea 4 conține studiul experimental și interpretarea rezultatelor. Secțiunea 5 prezintă comparația cu literatura de specialitate. Secțiunea 6 conține concluziile și direcțiile viitoare. La final sunt incluse bibliografia și anexele cu fragmente relevante de cod.
 
-\subsection{Soluții existente și limitele lor}
-Există algoritmi simpli, ușor de înțeles și implementat, cum sunt Bubble Sort, Insertion Sort și Selection Sort. Aceștia sunt utili didactic, dar devin lenți pentru intrări mari. Există și algoritmi mai eficienți, cum sunt Merge Sort și Quick Sort, iar în anumite condiții Counting Sort poate fi și mai rapid. Totuși, niciun algoritm nu este optim în orice situație, iar performanța depinde de natura datelor de intrare.
+% ===================== 2. PROBLEMA =====================
+\section{Prezentarea formală a problemei și a soluției}
 
-\subsection{Contribuția lucrării}
-Contribuția acestei lucrări constă în:
-\begin{itemize}
-    \item implementarea în Python a șase algoritmi de sortare;
-    \item definirea mai multor tipuri de date de test;
-    \item măsurarea experimentală a timpilor de execuție;
-    \item analiza comparativă a rezultatelor.
-\end{itemize}
-
-\subsection{Organizarea lucrării}
-Lucrarea este structurată astfel: Secțiunea 2 prezintă formal problema și proprietățile urmărite, Secțiunea 3 descrie implementarea și modul de rulare, Secțiunea 4 prezintă metodologia experimentală și rezultatele, Secțiunea 5 discută relația cu alte abordări, iar Secțiunea 6 conține concluziile și direcțiile de dezvoltare ulterioară.
-
-\section{Descriere formală a problemei și a soluției}
-
-\subsection{Definirea problemei}
-Fie o listă
+\subsection{Definirea formală a sortării}
+Fie o listă:
 \[
 A = [a_1, a_2, \dots, a_n]
 \]
-formată din numere întregi. Problema sortării constă în construirea unei permutări
+formată din $n$ numere întregi. Problema sortării constă în construirea unei permutări:
 \[
 A' = [b_1, b_2, \dots, b_n]
 \]
 astfel încât:
-\begin{enumerate}
-    \item elementele din $A'$ să fie exact aceleași ca în $A$;
-    \item să fie respectată relația de ordine:
-    \[
-    b_1 \leq b_2 \leq \dots \leq b_n.
-    \]
-\end{enumerate}
+\[
+b_1 \leq b_2 \leq \dots \leq b_n
+\]
+și lista $A'$ să conțină exact aceleași elemente ca lista inițială $A$.
 
 \subsection{Date de intrare și date de ieșire}
-\textbf{Intrare:} o listă de numere întregi.\\
-\textbf{Ieșire:} aceeași listă, ordonată crescător.
+\textbf{Date de intrare:} o listă de numere întregi.\\
+\textbf{Date de ieșire:} aceeași listă, ordonată crescător.
 
 \subsection{Proprietăți urmărite}
-Pentru a considera corectă o metodă de sortare, trebuie să fie îndeplinite două proprietăți:
+Un algoritm de sortare trebuie să respecte două proprietăți esențiale:
 \begin{itemize}
-    \item \textbf{corectitudine}: rezultatul final este sortat crescător;
-    \item \textbf{conservarea elementelor}: lista rezultată conține exact aceleași valori ca lista inițială.
+    \item \textbf{corectitudine}: rezultatul final trebuie să fie ordonat crescător;
+    \item \textbf{conservarea elementelor}: lista sortată trebuie să conțină exact aceleași valori ca lista inițială.
 \end{itemize}
 
 \subsection{Algoritmii analizați}
-În acest proiect au fost studiați următorii algoritmi:
-\begin{itemize}
-    \item Bubble Sort
-    \item Insertion Sort
-    \item Selection Sort
-    \item Merge Sort
-    \item Quick Sort
-    \item Counting Sort
-\end{itemize}
+În lucrare sunt analizați următorii algoritmi:
+\begin{enumerate}
+    \item Bubble Sort;
+    \item Insertion Sort;
+    \item Selection Sort;
+    \item Merge Sort;
+    \item Quick Sort;
+    \item Counting Sort.
+\end{enumerate}
+
+Acești algoritmi au fost aleși deoarece acoperă mai multe clase importante: algoritmi simpli cu complexitate pătratică, algoritmi de tip divide et impera și un algoritm necomparativ.
 
 \subsection{Complexități teoretice}
-Tabelul \ref{tab:complexitati} prezintă complexitățile teoretice ale algoritmilor utilizați.
 
 \begin{table}[H]
 \centering
-\caption{Complexități teoretice}
+\caption{Complexități teoretice ale algoritmilor analizați}
 \label{tab:complexitati}
 \begin{tabular}{>{\raggedright\arraybackslash}p{3.2cm} >{\centering\arraybackslash}p{3cm} >{\centering\arraybackslash}p{3cm} >{\centering\arraybackslash}p{3cm}}
 \toprule
@@ -148,37 +161,179 @@ Counting Sort & $O(n+k)$ & $O(n+k)$ & $O(n+k)$ \\
 \end{tabular}
 \end{table}
 
-Aici, $n$ reprezintă numărul de elemente, iar $k$ reprezintă intervalul valorilor posibile pentru Counting Sort.
+În tabel, $n$ reprezintă numărul de elemente, iar $k$ reprezintă dimensiunea intervalului valorilor posibile pentru Counting Sort.
 
+% ===================== 3. IMPLEMENTARE =====================
 \section{Modelarea problemei și implementarea soluției}
 
-\subsection{Limbajul folosit}
-Toți algoritmii au fost implementați în limbajul Python, deoarece oferă o sintaxă clară și este potrivit pentru experimente de laborator și proiecte introductive.
+\subsection{Limbajul de programare utilizat}
+Implementarea a fost realizată în limbajul Python. Acesta a fost ales deoarece are o sintaxă clară, permite scrierea rapidă a codului și oferă module utile pentru măsurarea timpului și calculul mediei rezultatelor. În program au fost utilizate modulele \texttt{random}, \texttt{time} și \texttt{statistics}.
 
-\subsection{Structura programului}
-Programul conține:
+\subsection{Structura generală a programului}
+Programul este alcătuit din următoarele componente:
 \begin{itemize}
-    \item implementarea fiecărui algoritm de sortare;
-    \item funcții pentru generarea seturilor de date;
-    \item o funcție pentru măsurarea timpului de execuție;
-    \item o funcție principală care rulează toate testele și scrie rezultatele într-un fișier text.
+    \item funcții separate pentru fiecare algoritm de sortare;
+    \item funcții pentru generarea listelor de test;
+    \item o funcție de măsurare a timpului de execuție;
+    \item o funcție principală care rulează experimentele și salvează rezultatele în fișierul \texttt{rezultate.txt}.
 \end{itemize}
 
-\subsection{Tipuri de date generate}
-Au fost utilizate următoarele categorii de liste:
+\subsection{Bubble Sort}
+Bubble Sort este unul dintre cei mai simpli algoritmi de sortare. Acesta parcurge lista de mai multe ori și compară elementele adiacente. Dacă două elemente vecine nu sunt în ordine corectă, ele sunt interschimbate.
+
+Avantajul său principal este simplitatea, însă dezavantajul major este eficiența redusă. Algoritmul execută foarte multe comparații, motiv pentru care nu este potrivit pentru liste mari.
+
+\begin{lstlisting}[style=mypython, caption={Implementarea Bubble Sort}]
+def bubblesort(a):
+    a = a[:]
+    n = len(a)
+    for i in range(n):
+        for j in range(n - i - 1):
+            if a[j] > a[j + 1]:
+                a[j], a[j + 1] = a[j + 1], a[j]
+    return a
+\end{lstlisting}
+
+\subsection{Insertion Sort}
+Insertion Sort construiește treptat o sublistă sortată. La fiecare pas, elementul curent este inserat pe poziția corectă în partea deja sortată a listei.
+
+Acest algoritm este eficient pentru liste mici sau aproape sortate. În cazul unei liste deja sortate, complexitatea sa devine liniară, deoarece sunt necesare foarte puține mutări.
+
+\begin{lstlisting}[style=mypython, caption={Implementarea Insertion Sort}]
+def insertionsort(a):
+    a = a[:]
+    for i in range(1, len(a)):
+        key = a[i]
+        j = i - 1
+        while j >= 0 and a[j] > key:
+            a[j + 1] = a[j]
+            j -= 1
+        a[j + 1] = key
+    return a
+\end{lstlisting}
+
+\subsection{Selection Sort}
+Selection Sort împarte lista în două zone: o zonă sortată și una nesortată. La fiecare pas se caută cel mai mic element din partea nesortată și se mută la începutul acesteia.
+
+Spre deosebire de Insertion Sort, Selection Sort nu profită de faptul că lista ar putea fi deja sortată. De aceea, timpul său de execuție rămâne aproximativ constant pentru tipuri diferite de intrare.
+
+\begin{lstlisting}[style=mypython, caption={Implementarea Selection Sort}]
+def selectionsort(a):
+    a = a[:]
+    n = len(a)
+    for i in range(n):
+        minidx = i
+        for j in range(i + 1, n):
+            if a[j] < a[minidx]:
+                minidx = j
+        a[i], a[minidx] = a[minidx], a[i]
+    return a
+\end{lstlisting}
+
+\subsection{Merge Sort}
+Merge Sort este un algoritm eficient bazat pe metoda divide et impera. Lista este împărțită recursiv în două jumătăți, fiecare jumătate este sortată, iar apoi cele două liste sortate sunt interclasate.
+
+Algoritmul are complexitate $O(n \log n)$ în toate cazurile, ceea ce îl face stabil și predictibil. Dezavantajul său este faptul că folosește memorie suplimentară pentru interclasare.
+
+\begin{lstlisting}[style=mypython, caption={Implementarea Merge Sort}]
+def mergesort(a):
+    if len(a) <= 1:
+        return a
+
+    mij = len(a) // 2
+    st = mergesort(a[:mij])
+    dr = mergesort(a[mij:])
+
+    rez = []
+    i = j = 0
+
+    while i < len(st) and j < len(dr):
+        if st[i] < dr[j]:
+            rez.append(st[i])
+            i += 1
+        else:
+            rez.append(dr[j])
+            j += 1
+
+    rez += st[i:]
+    rez += dr[j:]
+    return rez
+\end{lstlisting}
+
+\subsection{Quick Sort}
+Quick Sort este tot un algoritm divide et impera. Acesta alege un element pivot și împarte lista în trei părți: elemente mai mici decât pivotul, elemente egale cu pivotul și elemente mai mari decât pivotul.
+
+În practică, Quick Sort este foarte rapid, mai ales când pivotul împarte lista relativ echilibrat. Totuși, în caz nefavorabil poate ajunge la complexitatea $O(n^2)$.
+
+\begin{lstlisting}[style=mypython, caption={Implementarea Quick Sort}]
+def quicksort(a):
+    if len(a) <= 1:
+        return a
+
+    pivot = a[len(a) // 2]
+    st = [x for x in a if x < pivot]
+    mij = [x for x in a if x == pivot]
+    dr = [x for x in a if x > pivot]
+
+    return quicksort(st) + mij + quicksort(dr)
+\end{lstlisting}
+
+\subsection{Counting Sort}
+Counting Sort este un algoritm necomparativ, potrivit pentru liste de numere întregi aflate într-un interval relativ mic. În loc să compare elementele între ele, algoritmul numără de câte ori apare fiecare valoare.
+
+În implementarea folosită, se determină valoarea minimă și valoarea maximă, se construiește un vector de frecvență, iar apoi se reconstruiește lista sortată.
+
+\begin{lstlisting}[style=mypython, caption={Implementarea Counting Sort}]
+def countingsort(a):
+    if not a:
+        return []
+
+    mn, mx = min(a), max(a)
+    count = [0] * (mx - mn + 1)
+
+    for x in a:
+        count[x - mn] += 1
+
+    rez = []
+    for i, c in enumerate(count):
+        rez.extend([i + mn] * c)
+
+    return rez
+\end{lstlisting}
+
+\subsection{Generarea datelor de test}
+Pentru a compara algoritmii în condiții variate, au fost generate cinci categorii de liste:
 \begin{itemize}
-    \item \textbf{random} -- liste cu valori generate aleator;
-    \item \textbf{sorted} -- liste deja sortate crescător;
-    \item \textbf{reverse} -- liste ordonate descrescător;
-    \item \textbf{nearly} -- liste aproape sortate, cu puține interschimbări;
-    \item \textbf{flat} -- liste cu multe valori repetitive.
+    \item \textbf{random}: valori generate aleator;
+    \item \textbf{sorted}: valori deja sortate crescător;
+    \item \textbf{reverse}: valori sortate descrescător;
+    \item \textbf{nearly}: liste aproape sortate, în care se fac câteva interschimbări;
+    \item \textbf{flat}: liste cu multe valori repetitive.
 \end{itemize}
 
-\subsection{Măsurarea performanței}
-Pentru măsurarea timpului de execuție s-a folosit funcția \texttt{time.perf\_counter()}, deoarece oferă o precizie bună pentru măsurători scurte. Pentru fiecare combinație algoritm--tip de date--dimensiune s-au făcut 5 rulări, iar rezultatul folosit în analiză a fost media lor aritmetică.
+\begin{lstlisting}[style=mypython, caption={Generarea datelor de test}]
+def randomlist(n):
+    return [random.randint(0, n) for _ in range(n)]
 
-\subsection{Fragment reprezentativ de cod}
-Mai jos este prezentat un fragment relevant din implementare:
+def sortedlist(n):
+    return list(range(n))
+
+def reverselist(n):
+    return list(range(n, 0, -1))
+
+def nearlysorted(n):
+    a = list(range(n))
+    for _ in range(max(1, n // 20)):
+        i, j = random.randint(0, n - 1), random.randint(0, n - 1)
+        a[i], a[j] = a[j], a[i]
+    return a
+
+def flatlist(n):
+    return [random.randint(0, 5) for _ in range(n)]
+\end{lstlisting}
+
+\subsection{Măsurarea timpului de execuție}
+Pentru măsurarea performanței s-a folosit funcția \texttt{time.perf\_counter()}, potrivită pentru măsurători precise ale intervalelor scurte de timp.
 
 \begin{lstlisting}[style=mypython, caption={Măsurarea timpului de execuție}]
 def measure(func, data):
@@ -187,34 +342,30 @@ def measure(func, data):
     return time.perf_counter() - t0
 \end{lstlisting}
 
-\subsection{Instrucțiuni de rulare}
-Programul poate fi rulat direct din terminal cu:
-\begin{verbatim}
-python nume_fisier.py
-\end{verbatim}
+Fiecare test a fost rulat de cinci ori, iar valoarea raportată reprezintă media aritmetică a timpilor.
 
-La final, rezultatele sunt salvate în fișierul \texttt{rezultate.txt}.
-
+% ===================== 4. EXPERIMENT =====================
 \section{Studiu experimental}
 
 \subsection{Metodologie}
-Experimentul a fost conceput pentru a compara comportamentul practic al algoritmilor de sortare în condiții cât mai variate. Au fost testate dimensiunile:
+Experimentul a fost realizat pentru următoarele dimensiuni ale listelor:
 \[
 10,\ 50,\ 100,\ 1000,\ 5000,\ 10000.
 \]
 
-Nu s-au folosit liste foarte mari (de ordinul sutelor de mii sau milioanelor de elemente), deoarece algoritmii de complexitate $O(n^2)$ devin impracticabili în astfel de condiții, atât din cauza timpului de execuție, cât și din cauza limitărilor hardware.
+Pentru fiecare dimensiune și fiecare tip de date au fost rulați toți cei șase algoritmi. Rezultatele au fost salvate într-un fișier text, pentru a putea fi analizate ulterior.
 
-\subsection{Rezultate reprezentative}
-Pentru a păstra documentul clar, în continuare sunt prezentate două tabele sintetice, urmate de interpretarea lor.
+Nu au fost folosite liste de ordinul sutelor de mii sau milioanelor de elemente, deoarece algoritmii de complexitate $O(n^2)$ devin foarte lenți și ar necesita un timp de execuție prea mare.
+
+\subsection{Rezultate pentru liste random}
 
 \begin{table}[H]
 \centering
-\caption{Timp de execuție pentru date \texttt{random}, $n=10000$}
+\caption{Timp de execuție pentru date random, $n=10000$}
 \label{tab:random10000}
 \begin{tabular}{lc}
 \toprule
-\textbf{Algoritm} & \textbf{Timp mediu (sec)} \\
+\textbf{Algoritm} & \textbf{Timp mediu (secunde)} \\
 \midrule
 Bubble Sort    & 3.525053 \\
 Insertion Sort & 1.595017 \\
@@ -225,6 +376,8 @@ Counting Sort  & 0.001970 \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+\subsection{Rezultate comparative pentru toate tipurile de date}
 
 \begin{table}[H]
 \centering
@@ -245,30 +398,54 @@ Counting  & 0.001970 & 0.001859 & 0.001883 & 0.001921 & 0.000570 \\
 \end{table}
 
 \subsection{Analiza rezultatelor}
-Pe baza rezultatelor obținute, se observă următoarele aspecte importante:
+Rezultatele experimentale evidențiază diferențe clare între algoritmi.
 
-\begin{enumerate}
-    \item \textbf{Bubble Sort} este cel mai lent algoritm în aproape toate testele. Acest lucru era de așteptat, deoarece face foarte multe comparații și interschimbări.
-    
-    \item \textbf{Insertion Sort} are un comportament foarte bun pe liste sortate sau aproape sortate. De exemplu, pentru liste sortate cu $n=10000$, timpul este foarte mic în comparație cu celelalte cazuri.
-    
-    \item \textbf{Selection Sort} are o performanță relativ constantă, dar slabă. Nu profită de faptul că datele sunt deja ordonate.
-    
-    \item \textbf{Merge Sort} oferă rezultate bune și stabile, indiferent de tipul de intrare. Acest lucru corespunde complexității sale de ordin $O(n \log n)$ în toate cazurile.
-    
-    \item \textbf{Quick Sort} este foarte rapid în practică și, în testele realizate, a avut performanțe apropiate sau mai bune decât Merge Sort.
-    
-    \item \textbf{Counting Sort} este cel mai rapid algoritm în aproape toate situațiile testate. Totuși, acest rezultat trebuie interpretat ținând cont de faptul că algoritmul este potrivit doar când valorile sunt întregi și intervalul lor nu este foarte mare.
-\end{enumerate}
+\subsubsection{Bubble Sort}
+Bubble Sort este cel mai lent algoritm în majoritatea testelor. Pentru $n=10000$, timpul de execuție depășește câteva secunde, ceea ce confirmă faptul că algoritmul nu este potrivit pentru liste mari.
 
-\subsection{Observații speciale}
-Un rezultat interesant apare în cazul listelor de tip \texttt{flat}, unde există multe valori repetate. În această situație, Quick Sort și Counting Sort obțin timpi foarte buni. De asemenea, Insertion Sort devine foarte eficient când lista este deja aproape ordonată, ceea ce confirmă comportamentul teoretic al algoritmului.
+\subsubsection{Insertion Sort}
+Insertion Sort are rezultate slabe pe liste random și reverse, dar se comportă foarte bine pe liste sortate și aproape sortate. Pentru lista deja sortată de dimensiune $10000$, timpul său este foarte mic, deoarece nu mai sunt necesare mutări semnificative.
 
-\section{Related work / Lucrări conexe}
+\subsubsection{Selection Sort}
+Selection Sort are un timp relativ constant indiferent de tipul de intrare. Acest lucru se explică prin faptul că algoritmul caută minimul la fiecare pas, chiar dacă lista este deja ordonată.
 
-Problema sortării este intens studiată în literatura de specialitate și apare în aproape toate cursurile introductive de algoritmi. Algoritmii clasici, precum Bubble Sort, Insertion Sort și Selection Sort, sunt folosiți în principal pentru înțelegerea tehnicilor de bază. Algoritmii mai eficienți, precum Merge Sort și Quick Sort, sunt considerați standarde importante în studiul proiectării algoritmilor.
+\subsubsection{Merge Sort}
+Merge Sort are performanțe bune și stabile pentru toate tipurile de date. Această stabilitate este explicată de complexitatea $O(n \log n)$ în toate cazurile.
 
-Din punct de vedere al comparației dintre metode, se pot observa următoarele avantaje și dezavantaje:
+\subsubsection{Quick Sort}
+Quick Sort este foarte rapid în testele realizate. Implementarea folosește pivotul din mijloc și separă explicit elementele egale cu pivotul, ceea ce explică performanța foarte bună pe listele cu multe valori repetitive.
+
+\subsubsection{Counting Sort}
+Counting Sort este cel mai rapid algoritm în majoritatea cazurilor. Totuși, rezultatul trebuie interpretat cu atenție: algoritmul este eficient deoarece datele sunt întregi și intervalul valorilor este limitat. Pentru valori foarte mari sau dispersate, consumul de memorie ar putea crește semnificativ.
+
+\subsection{Limitări ale experimentului}
+Experimentul are câteva limitări:
+\begin{itemize}
+    \item testele au fost realizate doar în Python;
+    \item nu s-au testat liste foarte mari;
+    \item nu s-a măsurat consumul de memorie;
+    \item rezultatele pot varia în funcție de calculatorul folosit;
+    \item implementările sunt didactice, nu optimizate la nivel industrial.
+\end{itemize}
+
+% ===================== 5. LITERATURA =====================
+\section{Comparația cu literatura de specialitate}
+
+Sortarea este una dintre cele mai studiate teme din literatura informaticii. Lucrări clasice precum \textit{Introduction to Algorithms} de Cormen, Leiserson, Rivest și Stein, respectiv \textit{The Art of Computer Programming, Volume 3: Sorting and Searching} de Donald Knuth, prezintă în detaliu algoritmii de sortare, demonstrațiile de corectitudine și analiza complexităților.
+
+\subsection{Algoritmi simpli}
+Bubble Sort, Insertion Sort și Selection Sort sunt frecvent prezentați în materiale introductive deoarece sunt ușor de înțeles și de implementat. Totuși, din punct de vedere practic, aceștia au performanțe slabe pentru intrări mari, din cauza complexității $O(n^2)$.
+
+\subsection{Merge Sort}
+Merge Sort este asociat cu metoda divide et impera și este menționat în literatura clasică drept un algoritm eficient și stabil. Ideea de bază este împărțirea problemei în subprobleme mai mici, rezolvarea lor recursivă și combinarea rezultatelor.
+
+\subsection{Quick Sort}
+Quick Sort a fost introdus de C. A. R. Hoare și publicat în revista \textit{The Computer Journal}. În literatura de specialitate este considerat unul dintre cei mai eficienți algoritmi de sortare prin comparații în practică, deși cazul nefavorabil poate avea complexitate $O(n^2)$.
+
+\subsection{Counting Sort}
+Counting Sort este diferit de algoritmii anteriori deoarece nu sortează prin comparații. El utilizează un vector de frecvență și poate atinge complexitate liniară $O(n+k)$ atunci când intervalul valorilor este mic. Din acest motiv, algoritmul este util în situații particulare, dar nu este o soluție generală pentru orice tip de date.
+
+\subsection{Avantaje și dezavantaje}
 
 \begin{table}[H]
 \centering
@@ -278,27 +455,209 @@ Din punct de vedere al comparației dintre metode, se pot observa următoarele a
 \toprule
 \textbf{Algoritm} & \textbf{Avantaje} & \textbf{Dezavantaje} \\
 \midrule
-Bubble Sort & Foarte ușor de înțeles și implementat & Foarte lent pentru liste mari \\
-Insertion Sort & Bun pentru liste mici sau aproape sortate & Slab pentru liste mari, în special în caz nefavorabil \\
-Selection Sort & Implementare simplă, număr redus de interschimbări & Timp mare, nu profită de ordonarea existentă \\
-Merge Sort & Stabil, eficient și predictibil & Folosește memorie suplimentară \\
-Quick Sort & Foarte rapid în practică & Poate avea caz nefavorabil $O(n^2)$ \\
-Counting Sort & Extrem de rapid în condiții potrivite & Nu este general; depinde de intervalul valorilor \\
+Bubble Sort & Foarte simplu, potrivit pentru înțelegerea comparațiilor și interschimbărilor & Foarte lent pentru liste mari; complexitate pătratică \\
+Insertion Sort & Eficient pe liste mici, sortate sau aproape sortate & Ineficient pe liste mari și în caz invers sortat \\
+Selection Sort & Implementare simplă; număr relativ redus de interschimbări & Nu profită de date deja sortate; complexitate $O(n^2)$ \\
+Merge Sort & Stabil, eficient și predictibil & Necesită memorie suplimentară \\
+Quick Sort & Foarte rapid în practică; potrivit pentru multe situații & Poate ajunge la $O(n^2)$ în caz nefavorabil \\
+Counting Sort & Foarte rapid pentru numere întregi într-un interval mic & Nu este general; consumul de memorie depinde de intervalul valorilor \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Astfel, lucrarea de față se încadrează într-o direcție clasică de analiză experimentală a algoritmilor, punând accent pe compararea practică a performanței și nu doar pe prezentarea teoretică.
-
+% ===================== 6. CONCLUZII =====================
 \section{Concluzii și direcții viitoare}
 
 \subsection{Concluzii}
 În urma experimentelor realizate, se pot formula următoarele concluzii:
 \begin{itemize}
-    \item algoritmii de complexitate $O(n^2)$ sunt potriviți mai ales pentru învățare și pentru intrări mici;
-    \item pentru liste mai mari, Merge Sort și Quick Sort sunt opțiuni mult mai bune;
-    \item Counting Sort este extrem de eficient atunci când datele respectă condițiile necesare;
-    \item structura datelor de intrare influențează puternic performanța anumitor algoritmi;
-    \item analiza practică confirmă, în mare parte, complexitățile teoretice studiate la curs.
+    \item algoritmii Bubble Sort, Insertion Sort și Selection Sort sunt utili pentru învățare, dar nu sunt potriviți pentru liste mari;
+    \item Insertion Sort are performanțe foarte bune atunci când datele sunt deja sortate sau aproape sortate;
+    \item Selection Sort are performanță relativ constantă, dar slabă;
+    \item Merge Sort este stabil și oferă performanțe bune indiferent de tipul de date;
+    \item Quick Sort este foarte rapid în practică, mai ales cu o alegere potrivită a pivotului;
+    \item Counting Sort este cel mai rapid în experimentele realizate, dar depinde de natura valorilor de intrare.
 \end{itemize}
+
+Rezultatele confirmă faptul că analiza teoretică a complexității este relevantă în practică. Diferențele dintre $O(n^2)$, $O(n \log n)$ și $O(n+k)$ devin evidente pe măsură ce dimensiunea datelor crește.
+
+\subsection{Direcții viitoare}
+Lucrarea poate fi extinsă în mai multe direcții:
+\begin{itemize}
+    \item implementarea altor algoritmi, precum Heap Sort, Radix Sort sau Shell Sort;
+    \item compararea implementărilor Python cu implementări în C sau C++;
+    \item măsurarea consumului de memorie;
+    \item reprezentarea grafică a timpilor de execuție;
+    \item testarea pe volume de date mai mari;
+    \item compararea algoritmilor implementați manual cu funcția standard \texttt{sorted()} din Python.
+\end{itemize}
+
+% ===================== BIBLIOGRAFIE =====================
+\newpage
+\begin{thebibliography}{9}
+
+\bibitem{cormen}
+Thomas H. Cormen, Charles E. Leiserson, Ronald L. Rivest, Clifford Stein, \textit{Introduction to Algorithms}, 3rd Edition, MIT Press, 2009.
+
+\bibitem{knuth}
+Donald E. Knuth, \textit{The Art of Computer Programming, Volume 3: Sorting and Searching}, Addison-Wesley, 1998.
+
+\bibitem{sedgewick}
+Robert Sedgewick, Kevin Wayne, \textit{Algorithms}, 4th Edition, Addison-Wesley Professional, 2011.
+
+\bibitem{hoare}
+C. A. R. Hoare, ``Quicksort'', \textit{The Computer Journal}, Volume 5, Issue 1, pp. 10--16, Oxford University Press, 1962.
+
+\bibitem{python}
+Python Software Foundation, \textit{Python Documentation}, disponibil la \url{https://docs.python.org/3/}.
+
+\end{thebibliography}
+
+% ===================== ANEXE =====================
+\newpage
+\appendix
+
+\section{Cod sursă complet}
+
+\begin{lstlisting}[style=mypython, caption={Codul complet al proiectului}]
+import random
+import time
+import statistics
+
+def bubblesort(a):
+    a = a[:]
+    n = len(a)
+    for i in range(n):
+        for j in range(n - i - 1):
+            if a[j] > a[j + 1]:
+                a[j], a[j + 1] = a[j + 1], a[j]
+    return a
+
+def insertionsort(a):
+    a = a[:]
+    for i in range(1, len(a)):
+        key = a[i]
+        j = i - 1
+        while j >= 0 and a[j] > key:
+            a[j + 1] = a[j]
+            j -= 1
+        a[j + 1] = key
+    return a
+
+def selectionsort(a):
+    a = a[:]
+    n = len(a)
+    for i in range(n):
+        minidx = i
+        for j in range(i + 1, n):
+            if a[j] < a[minidx]:
+                minidx = j
+        a[i], a[minidx] = a[minidx], a[i]
+    return a
+
+def mergesort(a):
+    if len(a) <= 1:
+        return a
+    mij = len(a) // 2
+    st = mergesort(a[:mij])
+    dr = mergesort(a[mij:])
+    rez = []
+    i = j = 0
+    while i < len(st) and j < len(dr):
+        if st[i] < dr[j]:
+            rez.append(st[i])
+            i += 1
+        else:
+            rez.append(dr[j])
+            j += 1
+    rez += st[i:]
+    rez += dr[j:]
+    return rez
+
+def quicksort(a):
+    if len(a) <= 1:
+        return a
+    pivot = a[len(a) // 2]
+    st = [x for x in a if x < pivot]
+    mij = [x for x in a if x == pivot]
+    dr = [x for x in a if x > pivot]
+    return quicksort(st) + mij + quicksort(dr)
+
+def countingsort(a):
+    if not a:
+        return []
+    mn, mx = min(a), max(a)
+    count = [0] * (mx - mn + 1)
+    for x in a:
+        count[x - mn] += 1
+    rez = []
+    for i, c in enumerate(count):
+        rez.extend([i + mn] * c)
+    return rez
+
+ALGORITHMS = {
+    "Bubble": bubblesort,
+    "Insertion": insertionsort,
+    "Selection": selectionsort,
+    "Merge": mergesort,
+    "Quick": quicksort,
+    "Counting": countingsort
+}
+
+def randomlist(n):
+    return [random.randint(0, n) for _ in range(n)]
+
+def sortedlist(n):
+    return list(range(n))
+
+def reverselist(n):
+    return list(range(n, 0, -1))
+
+def nearlysorted(n):
+    a = list(range(n))
+    for _ in range(max(1, n // 20)):
+        i, j = random.randint(0, n - 1), random.randint(0, n - 1)
+        a[i], a[j] = a[j], a[i]
+    return a
+
+def flatlist(n):
+    return [random.randint(0, 5) for _ in range(n)]
+
+DATA_TYPES = {
+    "random": randomlist,
+    "sorted": sortedlist,
+    "reverse": reverselist,
+    "nearly": nearlysorted,
+    "flat": flatlist
+}
+
+def measure(func, data):
+    t0 = time.perf_counter()
+    func(data)
+    return time.perf_counter() - t0
+
+def runtests():
+    sizes = [10, 50, 100, 1000, 5000, 10000]
+    with open("rezultate.txt", "w", encoding="utf-8") as f:
+        f.write("Observatie importanta:\n")
+        f.write("Nu au fost testate liste de ordinul zecilor sau sutelor de milioane de elemente.\n")
+        f.write("Motivul este limitarea hardware: memorie RAM si timp de executie.\n")
+        f.write("Algoritmii de complexitate O(n^2) devin impracticabili pentru n foarte mare.\n")
+
+        for dtype in DATA_TYPES:
+            f.write(f"\nTip date: {dtype}\n")
+            for n in sizes:
+                data = DATA_TYPES[dtype](n)
+                f.write(f"\n n = {n}\n")
+                for name, func in ALGORITHMS.items():
+                    times = []
+                    for _ in range(5):
+                        times.append(measure(func, data))
+                    f.write(f"{name:10s}: {statistics.mean(times):.6f} sec\n")
+
+if __name__ == "__main__":
+    runtests()
+    print("Rezultatele au fost salvate in rezultate.txt")
+\end{lstlisting}
+
 \end{document}
